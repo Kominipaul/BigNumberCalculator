@@ -57,34 +57,16 @@ int pop(Node** head_ref) {
     return num;                     //RETURN THE DATA (NUMBER)
 }
 
-/*
-int move_head_next(Node** head_ref) {
+int listLength(Node** head_ref ) {
     Node* tmp = *head_ref;
-    if (tmp != NULL) {
-        printf("%d \n", tmp->num);
+    int size = 0;
+    while (tmp != NULL)
+    {
+        ++size;
         tmp = tmp->next;
-        *head_ref = tmp;
-        return 1;
-    } else return 0;
+    }
+    return size;
 }
-
-int move_head_prev(Node** head_ref) {
-    Node* tmp = *head_ref;
-    if (tmp != NULL) {
-        printf("%d \n", tmp->num);
-        tmp = tmp->prev;
-        *head_ref = tmp;
-        return 1;
-    } else return 0;
-}
-
-
-
-int get_num(Node** head_ref) {
-    Node* tmp = *head_ref;
-    if (tmp != NULL) return tmp->num;
-}
-*/
 
 void deallocate(Node** head_ref) {
     Node* tmp = *head_ref;      //CREATE TMP POINTED TO HEAD
@@ -170,6 +152,7 @@ void add(char *num1, char *num2, char *result) {
         char char_str[2] = {N, '\0'};
         strcat(result, char_str);
     }
+
 }
 
 void sub(char *num1, char *num2, char *result) {
@@ -179,6 +162,13 @@ void sub(char *num1, char *num2, char *result) {
 
     int len1 = strlen(num1);            //GET THE NUMBERS LENGHT
     int len2 = strlen(num2);
+
+    if (len1 < len2) {
+        swap(num1,num2);               //swap(str1,str2) : SWAPS THE 2 STRINGS
+    } else if (len1 == len2) { 
+        if(strcmp(num1, num2) < 0)      //WE CHECK AGAIN WHICH NUMBER IS BIGGER CAUSE OF CASE EX. 1-9
+        swap(num1,num2);
+    }
 
     for (int i = 0; i < len1; i++) {    //PUSH EVERY NUMBER TO THE LIST/STACK WITH PUSH() 
         push(&S1, num1[i] - '0');       //MAKING THEM INTEGERS WIHT ""( - '0' )""
@@ -242,6 +232,21 @@ void mult(char *num1, char *num2, char *result) {
         }
         
     }
+    
+    int lenS1 = listLength(&S1);
+    int lenS2 = listLength(&S2);
+
+    for(int i=0; i<lenS1;i++) {
+        for(int j=0; j<lenS2;j++) {
+
+            int p = is_empty(&S1) ? 0 : pop(&S1);  //POP THE NUMBERS
+            int q = is_empty(&S2) ? 0 : pop(&S2);
+
+            ans[i+j]+=p*q;
+            ans[i+j+1]=ans[i+j+1]+ans[i+j]/10;
+            ans[i+j]%=10;
+        }
+    }
        
 }
 */
@@ -263,8 +268,8 @@ void main() {
         } while (option < 0 || option > 3);
         
         //CREATE THE STRING FOR THE NUMBERS
-        char str1[MAX_SIZE], str2[MAX_SIZE], Num1[MAX_SIZE], Num2[MAX_SIZE];
-        char result[MAX_SIZE];
+        char str1[MAX_SIZE], str2[MAX_SIZE], num1[MAX_SIZE], num2[MAX_SIZE];
+        char result[MAX_SIZE] = "";
         int flag1 = 0, flag2 = 0;
 
         do
@@ -274,55 +279,92 @@ void main() {
             scanf("%s",&str1);
             printf("Enter the second number: ");
             scanf("%s",&str2);
-            strcpy(Num1,str1);
-            strcpy(Num2,str2);
-            if (str1[0] == '-') {
-                memmove(str1, str1+1, strlen(str1));
+            strcpy(num1,str1);
+            strcpy(num2,str2);
+
+            if (num1[0] == '-') {
+                memmove(num1, num1+1, strlen(num1));
                 flag1 = 1;
+            } else if (num1[0] == '+')
+            {
+                memmove(num1, num1+1, strlen(num1));
             }
-            if (str2[0] == '-') {
-                memmove(str2, str2+1, strlen(str2));
+            
+            if (num2[0] == '-') {
+                memmove(num2, num2+1, strlen(num2));
                 flag2 = 1;
+            } else if (num2[0] == '+')
+            {
+                memmove(num2, num2+1, strlen(num2));
             }
+            
             //digits_only() : IS FUNC THAT CHECH IS WE HAVE ONLY DIGITS
-            if(!digits_only(str1) || !digits_only(str2)) {
+            if(!digits_only(num1) || !digits_only(num2)) {
                 printf("\nOnly Number pls\n\n");
             }
-        } while (!digits_only(str1) || !digits_only(str2));
-        
-        //CHECK WHICH NUMBER IS BIGGER SO I DONT HAVE ANY PROBLEM WIHT SUB
-        if((strlen(str1))<(strlen(str2))) {
-            swap(str1,str2);                //swap(str1,str2) : SWAPS THE 2 STRINGS
-            int tmp = flag1;
-            flag1 = flag2;
-            flag2 = tmp;
-        }else if ((strlen(str1)) == (strlen(str2))) { 
-            if(strcmp(str1, str2) < 0)      //WE CHECK AGAIN WHICH NUMBER IS BIGGER CAUSE OF CASE EX. 1-9
-                swap(str1,str2);
-                int tmp = flag1;
-                flag1 = flag2;
-                flag2 = tmp;
-        }
+        } while (!digits_only(num1) || !digits_only(num2));
 
-        if (option == 1) {
-            if (flag1 == flag2 == 1) {strcat(result, "-");} //-
-            else if (flag2 == 1) {option = 2; strcat(result, "+");}
-            else if (flag1 == 1) {option = 2; strcat(result, "-");} //-
-        }else if (option == 2) {
-            if (flag1 == flag2 == 1) {strcat(result, "-");}//-  
-            else if (flag2 == 1) {option = 1; strcat(result, "+");}
-            else if (flag1 == 1) {option = 1; strcat(result, "-");}//-
-        }else {}
-        
 
+        
         //CHECK WHAT OPTION USER WANTS. CALL THE APPROPRIATE FUNC AND PRINT RESULTS.
         if (option == 1) {
-            add(str1, str2, result);    
-            printf("%s + %s = %s", Num1, Num2, result);
+            if (flag1 == 1 && flag2 == 1) {
+                strcat(result, "-");
+                add(num1, num2, result);
+
+            } else if (flag2 == 1) {
+                strcat(result, "+");
+                sub(num1, num2, result);
+
+            } else if (flag1 == 1) {
+                strcat(result, "-");
+                sub(num1, num2, result);
+                
+            } else {
+                strcat(result, "+");
+                add(num1, num2, result);
+            }
+            printf("(%s) + (%s) = %s", str1, str2, result);
 
         }else if (option == 2) {
-            sub(str1, str2, result);
-            printf("%s - %s = %s", Num1, Num2, result);
+            int str1_len = strlen(num1);
+            int str2_len = strlen(num2);
+
+            int str1smaller = 0;
+
+            if(str1_len < str1_len) {
+                str1smaller = 1;
+            }else if (str1_len == str2_len) { 
+                if(strcmp(num1, num2) < 0)      //WE CHECK AGAIN WHICH NUMBER IS BIGGER CAUSE OF CASE EX. 1-9
+                str1smaller = 1;
+            }
+    
+            if (flag1 == 1 && flag2 == 1) {
+                if(str1smaller) {
+                    strcat(result, "+");
+                } else strcat(result, "-");
+                sub(num1, num2, result);
+
+            } else if (flag2 == 1) {
+                if(str1smaller) {
+                    strcat(result, "+");
+                } else strcat(result, "+");
+                add(num1, num2, result);
+
+
+            } else if (flag1 == 1) {
+                if(str1smaller) {
+                    strcat(result, "-");
+                } else strcat(result, "-");
+                add(num1, num2, result);
+
+            } else {
+                if(str1smaller) {
+                    strcat(result, "-");
+                } else strcat(result, "+");
+                sub(num1, num2, result);
+            }
+            printf("(%s) - (%s) = %s", str1, str2, result);
 
         }else if (option == 3) {
 
