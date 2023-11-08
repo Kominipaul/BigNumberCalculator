@@ -24,6 +24,24 @@ int digits_only(const char *s) {
     return 1;
 }
 
+int get_next(Node** head_ref) {
+    Node* tmp = *head_ref;
+    if (tmp->next != NULL) {
+        int number = tmp->num;
+        tmp = tmp->next;
+        *head_ref = tmp;
+        return number;
+    } else {
+        int number = tmp->num;
+        while (tmp->prev != NULL)
+        {
+            tmp = tmp->prev;
+        }
+        *head_ref = tmp;
+        return number;
+    }
+}
+
 void push(Node** head_ref, int num) {
 
     Node* new_node = (Node*) malloc(sizeof(Node));  //CREATE NEW NODE
@@ -40,6 +58,23 @@ void push(Node** head_ref, int num) {
         new_node->next->prev = *head_ref;   //POINT OLD NODE PREV TO NEWNODE
         new_node->prev = NULL;              
     }
+}
+
+int pop_last(Node** head_ref) {
+    if (head_ref == NULL){
+        printf("Empty");
+    }
+    Node* tmp = *head_ref;
+
+    while (tmp->next->next != NULL) {
+        tmp = tmp->next;
+    }
+    Node* tmp2 = tmp;
+    tmp = tmp->next;
+    int num = tmp->num;
+    tmp2->next = NULL;
+    free(tmp);
+    return num;
 }
 
 int pop(Node** head_ref) {
@@ -119,70 +154,46 @@ int is_empty(Node** head_ref) {
     return *head_ref == NULL;
 }
 
-void add(char *num1, char *num2, char *result) {
-    Node* S1 = NULL;    //CREATE 3 LISTS
-    Node* S2 = NULL;
-    Node* S3 = NULL;
-
-    int len1 = strlen(num1);        //GET THE NUMBERS LENGHT
-    int len2 = strlen(num2);
+void filltheDLL(Node** N, char *num) {
+ 
+    int len1 = strlen(num);        //GET THE NUMBERS LENGHT
 
     for (int i = 0; i < len1; i++) { //PUSH EVERY NUMBER TO THE LIST/STACK WITH PUSH() 
-        push(&S1, num1[i] - '0');    //MAKING THEM INTEGERS WIHT ""( - '0' )""
+        push(N, num[i] - '0');    //MAKING THEM INTEGERS WIHT ""( - '0' )""
     }
+}
 
-    for (int i = 0; i < len2; i++) {
-        push(&S2, num2[i] - '0');
-    }
-
-    int rem = 0;
-
-    while (!is_empty(&S1) || !is_empty(&S2)) {  //WHILE THE STACK ISNT EMPTY
-        int n1 = is_empty(&S1) ? 0 : pop(&S1);  //POP THE NUMBERS
-        int n2 = is_empty(&S2) ? 0 : pop(&S2);
-
-        int sum = n1 + n2 + rem;    // ADD NUMBERS WITH THE REMENDER
-        push(&S3, sum % 10);        // PUSH TO STACK3 THE MOD
-        rem = sum / 10;             // HOLD THE DIV TO THE REMENDER
-    }
-    if (rem != 0) push(&S3, rem);   // AND LAST IF WE HAVE REM ADD IT TO STACK3
-
-    while (!is_empty(&S3)) {
-        char N = pop(&S3) + '0';
+void DLLtoString(Node** RESULT, char* result) {
+    while (!is_empty(RESULT)) {
+        char N = pop(RESULT) + '0';
         char char_str[2] = {N, '\0'};
         strcat(result, char_str);
     }
+}
+
+void add(Node** NUM1, Node** NUM2, Node** RESULT) {
+
+    int rem = 0;
+
+    while (!is_empty(NUM1) || !is_empty(NUM2)) {  //WHILE THE STACK ISNT EMPTY
+        int n1 = is_empty(NUM1) ? 0 : pop(NUM1);  //POP THE NUMBERS
+        int n2 = is_empty(NUM2) ? 0 : pop(NUM2);
+
+        int sum = n1 + n2 + rem;    // ADD NUMBERS WITH THE REMENDER
+        push(RESULT, sum % 10);        // PUSH TO STACK3 THE MOD
+        rem = sum / 10;             // HOLD THE DIV TO THE REMENDER
+    }
+    if (rem != 0) push(RESULT, rem);   // AND LAST IF WE HAVE REM ADD IT TO STACK3
 
 }
 
-void sub(char *num1, char *num2, char *result) {
-    Node* S1 = NULL;    //CREATE 3 LISTS
-    Node* S2 = NULL;
-    Node* S3 = NULL;
-
-    int len1 = strlen(num1);            //GET THE NUMBERS LENGHT
-    int len2 = strlen(num2);
-
-    if (len1 < len2) {
-        swap(num1,num2);               //swap(str1,str2) : SWAPS THE 2 STRINGS
-    } else if (len1 == len2) { 
-        if(strcmp(num1, num2) < 0)      //WE CHECK AGAIN WHICH NUMBER IS BIGGER CAUSE OF CASE EX. 1-9
-        swap(num1,num2);
-    }
-
-    for (int i = 0; i < len1; i++) {    //PUSH EVERY NUMBER TO THE LIST/STACK WITH PUSH() 
-        push(&S1, num1[i] - '0');       //MAKING THEM INTEGERS WIHT ""( - '0' )""
-    }
-
-    for (int i = 0; i < len2; i++) {
-        push(&S2, num2[i] - '0');
-    }
+void sub(Node** NUM1, Node** NUM2, Node** RESULT) {
 
     int borrow = 0;
 
-    while (!is_empty(&S1) || !is_empty(&S2)) {  //WHILE THE STACK ISNT EMPTY
-        int n1 = is_empty(&S1) ? 0 : pop(&S1);  //POP THE NUMBERS
-        int n2 = is_empty(&S2) ? 0 : pop(&S2);
+    while (!is_empty(NUM1) || !is_empty(NUM2)) {  //WHILE THE STACK ISNT EMPTY
+        int n1 = is_empty(NUM1) ? 0 : pop(NUM1);  //POP THE NUMBERS
+        int n2 = is_empty(NUM2) ? 0 : pop(NUM2);
 
         int diff = n1 - n2 - borrow;            //SUBTRACT THE NUMBER WITH THE BORROW
 
@@ -193,64 +204,56 @@ void sub(char *num1, char *num2, char *result) {
             borrow = 0;
         }
 
-        push(&S3, diff);    // PUSH THE DIFF
-    }
-
-    while (!is_empty(&S3)) {
-        char N = pop(&S3) + '0';
-        char char_str[2] = {N, '\0'};
-        strcat(result, char_str);
+        push(RESULT, diff);    // PUSH THE DIFF
     }
 }
 
-/*
-void mult(char *num1, char *num2, char *result) {
-    Node* S1 = NULL;    //CREATE 3 LISTS
-    Node* S2 = NULL;
-    Node* S3 = NULL;
 
-    int len1 = strlen(num1);    //GET THE NUMBERS LENGHT
-    int len2 = strlen(num2);
+void mult(Node** NUM1, Node** NUM2, Node** RESULT) {
 
-    for (int i = 0; i < len1; i++) {    //PUSH EVERY NUMBER TO THE LIST/STACK WITH PUSH() 
-        push(&S1, num1[i] - '0');       //MAKING THEM INTEGERS WIHT ""( - '0' )""
-    }
+    int lenS1 = listLength(NUM1);
+    int lenS2 = listLength(NUM2);
+    int k = 0, rem = 0;
+    int ans[lenS1+lenS2];
 
-    for (int i = 0; i < len2; i++) {
-        push(&S2, num2[i] - '0');
-    }
+    for(int i=0; i<lenS1; i++) {
 
-    while (!is_empty(&S2)) {
-        int n1 = is_empty(&S1) ? 0 : pop(&S1);  //POP THE NUMBERS
-        int n2 = is_empty(&S2) ? 0 : pop(&S2);
+        int num1 = get_next(NUM1);
 
-        int mult, ext
-        while (S1->next != NULL) {
-            mult = n1 * n2 + ext;
-            push(&S3, mult % 10);        // PUSH TO STACK3 THE MOD
-            ext = mult / 10;             // HOLD THE DIV TO THE REMENDER
+        for(int j=0; j<lenS2; j++) {
+
+            int num2 = get_next(NUM2);
+            int sum = num1 * num2 + rem;
+            push(RESULT, sum % 10);
+            rem = sum / 10;
         }
-        
-    }
-    
-    int lenS1 = listLength(&S1);
-    int lenS2 = listLength(&S2);
-
-    for(int i=0; i<lenS1;i++) {
-        for(int j=0; j<lenS2;j++) {
-
-            int p = is_empty(&S1) ? 0 : pop(&S1);  //POP THE NUMBERS
-            int q = is_empty(&S2) ? 0 : pop(&S2);
-
-            ans[i+j]+=p*q;
-            ans[i+j+1]=ans[i+j+1]+ans[i+j]/10;
-            ans[i+j]%=10;
+        if (rem > 0){
+            push(RESULT, rem);
         }
+        for (int j = 0; j < k; j++) {
+            push(RESULT,0);
+        }
+
+        k++; 
+    }
+    show_StE(RESULT);
+    rem = 0;
+    int sum = 0;
+    while (!is_empty(RESULT))
+    {
+        sum = sum * 10 + pop_last(RESULT) + rem;
+        rem = sum / 10;
+        sum %= 10;
+    }
+    if (rem > 0) {
+        printf("%d", rem);
+    }
+    while (sum > 0) {
+        printf("%d", sum % 10);
+        sum /= 10;
     }
        
 }
-*/
-
 
 //MAIN #########################################################################
 
@@ -271,6 +274,9 @@ void main() {
         char str1[MAX_SIZE], str2[MAX_SIZE], num1[MAX_SIZE], num2[MAX_SIZE];
         char result[MAX_SIZE] = "";
         int flag1 = 0, flag2 = 0;
+        Node* NUM1 = NULL;
+        Node* NUM2 = NULL;
+        Node* RESULTS = NULL;
 
         do
         {
@@ -299,75 +305,88 @@ void main() {
             }
             
             //digits_only() : IS FUNC THAT CHECH IS WE HAVE ONLY DIGITS
-            if(!digits_only(num1) || !digits_only(num2)) {
+            if (!digits_only(num1) || !digits_only(num2)) {
                 printf("\nOnly Number pls\n\n");
             }
         } while (!digits_only(num1) || !digits_only(num2));
 
-
+        filltheDLL(&NUM1, num1);
+        filltheDLL(&NUM2, num2);
         
         //CHECK WHAT OPTION USER WANTS. CALL THE APPROPRIATE FUNC AND PRINT RESULTS.
         if (option == 1) {
             if (flag1 == 1 && flag2 == 1) {
                 strcat(result, "-");
-                add(num1, num2, result);
+                add(&NUM1, &NUM2, &RESULTS);
 
             } else if (flag2 == 1) {
                 strcat(result, "+");
-                sub(num1, num2, result);
+                sub(&NUM1, &NUM2, &RESULTS);
 
             } else if (flag1 == 1) {
                 strcat(result, "-");
-                sub(num1, num2, result);
+                sub(&NUM1, &NUM2, &RESULTS);
                 
             } else {
                 strcat(result, "+");
-                add(num1, num2, result);
+                add(&NUM1, &NUM2, &RESULTS);
+
             }
+            DLLtoString(&RESULTS, result);
             printf("(%s) + (%s) = %s", str1, str2, result);
 
-        }else if (option == 2) {
-            int str1_len = strlen(num1);
-            int str2_len = strlen(num2);
+        } else if (option == 2) {
+            int str1_len = listLength(&NUM1);
+            int str2_len = listLength(&NUM2);
 
             int str1smaller = 0;
 
-            if(str1_len < str1_len) {
+            if (str1_len < str1_len) {
                 str1smaller = 1;
-            }else if (str1_len == str2_len) { 
+            } else if (str1_len == str2_len) { 
                 if(strcmp(num1, num2) < 0)      //WE CHECK AGAIN WHICH NUMBER IS BIGGER CAUSE OF CASE EX. 1-9
                 str1smaller = 1;
             }
     
             if (flag1 == 1 && flag2 == 1) {
-                if(str1smaller) {
+                if (str1smaller) {
                     strcat(result, "+");
-                } else strcat(result, "-");
-                sub(num1, num2, result);
-
+                    sub(&NUM2, &NUM1, &RESULTS);
+                } else {
+                    strcat(result, "-");
+                    sub(&NUM1, &NUM2, &RESULTS);
+                }
+                
             } else if (flag2 == 1) {
-                if(str1smaller) {
-                    strcat(result, "+");
-                } else strcat(result, "+");
-                add(num1, num2, result);
-
+                strcat(result, "+");
+                add(&NUM1, &NUM2, &RESULTS);
 
             } else if (flag1 == 1) {
-                if(str1smaller) {
-                    strcat(result, "-");
-                } else strcat(result, "-");
-                add(num1, num2, result);
-
+                strcat(result, "-");
+                add(&NUM1, &NUM2, &RESULTS);
+  
             } else {
-                if(str1smaller) {
+                if (str1smaller) {
                     strcat(result, "-");
-                } else strcat(result, "+");
-                sub(num1, num2, result);
+                    sub(&NUM2, &NUM1, &RESULTS);
+                } else {
+                    strcat(result, "+");
+                    sub(&NUM1, &NUM2, &RESULTS);
+                }
+                
             }
+            DLLtoString(&RESULTS, result);
             printf("(%s) - (%s) = %s", str1, str2, result);
 
-        }else if (option == 3) {
-
+        } else if (option == 3) {
+            if (flag1 != flag2) {
+                strcat(result, "-");
+            } else {
+                strcat(result, "+");
+            }
+            mult(&NUM1, &NUM2, &RESULTS);
+            DLLtoString(&RESULTS, result);
+            printf("(%s) * (%s) = %s", str1, str2, result);
 
         }
         fflush(stdin);  // CLEAN THE BUFFER FOR ANY REMANING \N ECT.
