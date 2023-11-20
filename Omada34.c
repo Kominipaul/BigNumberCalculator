@@ -12,8 +12,8 @@ dit21090@go.uop.gr
 
 /*
 ΚΟΥΤΑΝΤΟΣ ΒΑΣΙΛΕΙΟΣ
-2022 2021 ΧΧΧΧΧ
-dit210@go.uop.gr
+2022 2021 00097
+dit21097@go.uop.gr
 */
 
 typedef struct Node {
