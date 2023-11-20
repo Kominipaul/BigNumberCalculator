@@ -10,6 +10,12 @@
 dit21090@go.uop.gr
 */
 
+/*
+ΚΟΥΤΑΝΤΟΣ ΒΑΣΙΛΕΙΟΣ
+2022 2021 ΧΧΧΧΧ
+dit210@go.uop.gr
+*/
+
 typedef struct Node {
     int num;
     struct Node *next;
@@ -17,7 +23,7 @@ typedef struct Node {
 } Node;
 
 
-int digits_only(const char *s) {
+int digits_only(const char *s) {    //this function flags if the string has anything but digits
     while (*s) {
         if (isdigit(*s++) == 0) return 0;
     }
@@ -25,15 +31,15 @@ int digits_only(const char *s) {
 }
 
 int get_next(Node** head_ref) {
-    Node* tmp = *head_ref;
-    if (tmp->next != NULL) {
-        int number = tmp->num;
-        tmp = tmp->next;
+    Node* tmp = *head_ref;      //CREATE TMP
+    if (tmp->next != NULL) {    //IF LAST NODE
+        int number = tmp->num;  //GET NUMBER
+        tmp = tmp->next;        //SET HEAD = TO TMP
         *head_ref = tmp;
-        return number;
+        return number;          //GET THE NUMBER
     } else {
         int number = tmp->num;
-        while (tmp->prev != NULL)
+        while (tmp->prev != NULL)   //THE SAME BUT WITH A LOOP
         {
             tmp = tmp->prev;
         }
@@ -62,19 +68,19 @@ void push(Node** head_ref, int num) {
 
 int pop_last(Node** head_ref) {
     if (head_ref == NULL){
-        printf("Empty");
+        printf("Empty");    //CHECK FOR EMPTY LIST
     }
-    Node* tmp = *head_ref;
+    Node* tmp = *head_ref;  //CREATE TMP
 
-    while (tmp->next->next != NULL) {
+    while (tmp->next->next != NULL) {   // GO TO THE END
         tmp = tmp->next;
     }
-    Node* tmp2 = tmp;
-    tmp = tmp->next;
-    int num = tmp->num;
-    tmp2->next = NULL;
+    Node* tmp2 = tmp;   //CREATE TMP2
+    tmp = tmp->next;    //MOVE TMP TO NEXT
+    int num = tmp->num; //STORE THE NEMBER TO A NUM 
+    tmp2->next = NULL;  //SET TMP2 TO NULL
     free(tmp);
-    return num;
+    return num;         
 }
 
 int pop(Node** head_ref) {
@@ -93,14 +99,14 @@ int pop(Node** head_ref) {
 }
 
 int listLength(Node** head_ref ) {
-    Node* tmp = *head_ref;
+    Node* tmp = *head_ref;      //CREATE TMP
     int size = 0;
-    while (tmp != NULL)
+    while (tmp != NULL)         //LOOP TO THE END
     {
-        ++size;
-        tmp = tmp->next;
+        ++size;                 //ADD ONE TO THE COUNTER
+        tmp = tmp->next;        
     }
-    return size;
+    return size;                //GET THE SIZE OF THE LIST
 }
 
 void deallocate(Node** head_ref) {
@@ -138,20 +144,20 @@ void show_EtS(Node** head_ref) {
     Node *tmp = *head_ref;
     if (*head_ref == NULL)
     {
-       printf("The List is empty\n");
+       printf("The List is empty\n");   //IF EMPTY
        return;
     }
 
-    while (tmp->next != NULL) tmp = tmp->next;
+    while (tmp->next != NULL) tmp = tmp->next; // GO THE END
 
-    while (tmp != NULL) {
-        printf("%d", tmp->num);
+    while (tmp != NULL) {           //LOOP TO START
+        printf("%d", tmp->num);     //PRINT NUMBERS
         tmp = tmp->prev;
     }
 }
 
 int is_empty(Node** head_ref) {
-    return *head_ref == NULL;
+    return *head_ref == NULL;   //CHECK IF LIST IS EMPTY
 }
 
 void filltheDLL(Node** N, char *num) {
@@ -163,11 +169,11 @@ void filltheDLL(Node** N, char *num) {
     }
 }
 
-void DLLtoString(Node** RESULT, char* result) {
-    while (!is_empty(RESULT)) {
-        char N = pop(RESULT) + '0';
-        char char_str[2] = {N, '\0'};
-        strcat(result, char_str);
+void DLLtoString(Node** RESULT, char* result) { //DOUBLE LINK LIST TO STRING
+    while (!is_empty(RESULT)) { 
+        char N = pop(RESULT) + '0';     //POP THE ITEAM TO A CHAR
+        char char_str[2] = {N, '\0'};   // ADD THE END CHARACTER
+        strcat(result, char_str);       //ADD THE CHAT TO THE MAIN STRING
     }
 }
 
