@@ -265,11 +265,23 @@ void mult(Node** NUM1, Node** NUM2, Node** RESULT) {
 
 void main() {
     int option;
+    printf("Made by PAOULIN KOMINI && KOUTANTOS BASILEIOS\n\n");
+    printf(" ____  _         _   _                 _                        \n");
+    printf("| __ )(_) __ _  | \\ | |_   _ _ __ ___ | |__   ___ _ __         \n");
+    printf("|  _ \\| |/ _` | |  \\| | | | | '_ ` _ \\| '_ \\ / _ \\ '__|    \n");
+    printf("| |_) | | (_| | | |\\  | |_| | | | | | | |_) |  __/ |           \n");
+    printf("|____/|_|\\__, | |_| \\_|\\__,_|_| |_| |_|_.__/ \\___|_|        \n");
+    printf("  ____   |___/           _       _                              \n");
+    printf(" / ___|__ _| | ___ _   _| | __ _| |_ ___  _ __                  \n");
+    printf("| |   / _` | |/ __| | | | |/ _` | __/ _ \\| '__|                \n");
+    printf("| |__| (_| | | (__| |_| | | (_| | || (_) | |                    \n");
+    printf(" \\____\\__,_|_|\\___|\\__,_|_|\\__,_|\\__\\___/|_|             \n");
+
     while (option != 0)
     {
         do {
             //MENU A WHILE UNTIL YOU GET A 1,2,3 OR 0 TO END
-            printf("\n\n0.Exit\n1.Addition\n2.Subtraction\n3.Multiplication\n\n");
+            printf("\n\n[0] Exit\n[1] Addition\n[2] Subtraction\n[3] Multiplication\n\n");
             scanf("%d", &option);
             fflush(stdin);
             if (option == 0) exit(1);
@@ -339,7 +351,7 @@ void main() {
 
             }
             DLLtoString(&RESULTS, result);
-            printf("(%s) + (%s) = %s", str1, str2, result);
+            printf("\n(%s) + (%s) = %s\n", str1, str2, result);
 
         } else if (option == 2) {
             int str1_len = listLength(&NUM1);
@@ -382,7 +394,7 @@ void main() {
                 
             }
             DLLtoString(&RESULTS, result);
-            printf("(%s) - (%s) = %s", str1, str2, result);
+            printf("\n(%s) - (%s) = %s\n", str1, str2, result);
 
         } else if (option == 3) {
             if (flag1 != flag2) {
