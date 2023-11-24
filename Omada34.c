@@ -48,6 +48,27 @@ int get_next(Node** head_ref) {
     }
 }
 
+void insert(Node** head_ref, int num) {
+    Node* new_node = (Node*) malloc(sizeof(Node));
+    Node* tmp = *head_ref;  
+
+    new_node->num = num;
+    new_node->next = NULL;
+    new_node->prev = NULL;
+
+    if (*head_ref == NULL)
+    {
+       *head_ref = new_node;
+       return;
+    }
+ 
+    while (tmp->next != NULL)
+        tmp = tmp->next;
+    tmp->next = new_node;
+    new_node->prev = tmp;
+    return;
+}
+
 void push(Node** head_ref, int num) {
 
     Node* new_node = (Node*) malloc(sizeof(Node));  //CREATE NEW NODE
@@ -162,10 +183,10 @@ int is_empty(Node** head_ref) {
 
 void filltheDLL(Node** N, char *num) {
  
-    int len1 = strlen(num);        //GET THE NUMBERS LENGHT
+    int len1 = strlen(num);             //GET THE NUMBERS LENGHT
 
-    for (int i = 0; i < len1; i++) { //PUSH EVERY NUMBER TO THE LIST/STACK WITH PUSH() 
-        push(N, num[i] - '0');    //MAKING THEM INTEGERS WIHT ""( - '0' )""
+    for (int i = 0; i < len1; i++) {    //PUSH EVERY NUMBER TO THE LIST/STACK WITH PUSH() 
+        push(N, num[i] - '0');          //MAKING THEM INTEGERS WIHT ""( - '0' )""
     }
 }
 
@@ -175,6 +196,17 @@ void DLLtoString(Node** RESULT, char* result) { //DOUBLE LINK LIST TO STRING
         char char_str[2] = {N, '\0'};   // ADD THE END CHARACTER
         strcat(result, char_str);       //ADD THE CHAT TO THE MAIN STRING
     }
+}
+
+void cpDLL(Node** OR, Node** CP) {
+    Node *ORIGINAL = *OR;
+    deallocate(CP);
+    while(ORIGINAL!= NULL) {
+        push(CP, ORIGINAL->num);
+        
+        ORIGINAL = ORIGINAL->next;
+    }
+    
 }
 
 void add(Node** NUM1, Node** NUM2, Node** RESULT) {
@@ -219,46 +251,44 @@ void mult(Node** NUM1, Node** NUM2, Node** RESULT) {
 
     int lenS1 = listLength(NUM1);
     int lenS2 = listLength(NUM2);
-    int k = 0, rem = 0;
+    Node* this = NULL;
+    Node* that = NULL;
+    filltheDLL(&this, "0");
+    int k = 0, rem;
     int ans[lenS1+lenS2];
 
-    for(int i=0; i<lenS1; i++) {
+    for(int i=0; i<lenS2; i++) {
 
-        int num1 = get_next(NUM1);
+        int num2 = get_next(NUM2);
+        rem = 0;
 
-        for(int j=0; j<lenS2; j++) {
+        for(int j=0; j<lenS1; j++) {
 
-            int num2 = get_next(NUM2);
+            int num1 = get_next(NUM1);
             int sum = num1 * num2 + rem;
-            push(RESULT, sum % 10);
+            insert(RESULT, sum % 10);
             rem = sum / 10;
         }
         if (rem > 0){
-            push(RESULT, rem);
-        }
-        for (int j = 0; j < k; j++) {
-            push(RESULT,0);
+            insert(RESULT, rem);
         }
 
+        for (int j = 0; j < k; j++) {
+            push(RESULT, 0);
+        }
+        printf("\n++++++++\n");
+        show_StE(RESULT);
+        printf("\n++++++++\n");
+
+        add(RESULT, &this, &that);
+        cpDLL(&that, &this);
+        deallocate(&that);
+        deallocate(RESULT);
         k++; 
+
     }
-    show_StE(RESULT);
-    rem = 0;
-    int sum = 0;
-    while (!is_empty(RESULT))
-    {
-        sum = sum * 10 + pop_last(RESULT) + rem;
-        rem = sum / 10;
-        sum %= 10;
-    }
-    if (rem > 0) {
-        printf("%d", rem);
-    }
-    while (sum > 0) {
-        printf("%d", sum % 10);
-        sum /= 10;
-    }
-       
+    cpDLL(&this, RESULT);
+    
 }
 
 //MAIN #########################################################################
@@ -290,7 +320,7 @@ void main() {
         
         //CREATE THE STRING FOR THE NUMBERS
         char str1[MAX_SIZE], str2[MAX_SIZE], num1[MAX_SIZE], num2[MAX_SIZE];
-        char result[MAX_SIZE] = "";
+        char sign;
         int flag1 = 0, flag2 = 0;
         Node* NUM1 = NULL;
         Node* NUM2 = NULL;
@@ -333,25 +363,48 @@ void main() {
         
         //CHECK WHAT OPTION USER WANTS. CALL THE APPROPRIATE FUNC AND PRINT RESULTS.
         if (option == 1) {
+            int str1_len = listLength(&NUM1);
+            int str2_len = listLength(&NUM2);
+
+            int str1smaller = 0;
+            
+            if (str1_len < str2_len) {
+                str1smaller = 1;
+            } else if (str1_len == str2_len) { 
+                if(strcmp(num1, num2) < 0)      //WE CHECK AGAIN WHICH NUMBER IS BIGGER CAUSE OF CASE EX. 1-9
+                str1smaller = 1;
+            }
+    
             if (flag1 == 1 && flag2 == 1) {
-                strcat(result, "-");
+                sign = '-';
                 add(&NUM1, &NUM2, &RESULTS);
 
             } else if (flag2 == 1) {
-                strcat(result, "+");
-                sub(&NUM1, &NUM2, &RESULTS);
+                if (str1smaller) {
+                    sign = '-';
+                    sub(&NUM2, &NUM1, &RESULTS);
+                } else {
+                    sign = '+';
+                    sub(&NUM1, &NUM2, &RESULTS);
+                }
 
             } else if (flag1 == 1) {
-                strcat(result, "-");
-                sub(&NUM1, &NUM2, &RESULTS);
+                if (str1smaller) {
+                    sign = '+';
+                    sub(&NUM2, &NUM1, &RESULTS);
+                } else {
+                    sign = '-';
+                    sub(&NUM1, &NUM2, &RESULTS);
+                }
                 
             } else {
-                strcat(result, "+");
+                sign = '+';
                 add(&NUM1, &NUM2, &RESULTS);
 
             }
-            DLLtoString(&RESULTS, result);
-            printf("\n(%s) + (%s) = %s\n", str1, str2, result);
+            //DLLtoString(&RESULTS, result);
+            printf("\n(%s) + (%s) = %c", str1, str2, sign);
+            show_StE(&RESULTS);
 
         } else if (option == 2) {
             int str1_len = listLength(&NUM1);
@@ -359,7 +412,7 @@ void main() {
 
             int str1smaller = 0;
 
-            if (str1_len < str1_len) {
+            if (str1_len < str2_len) {
                 str1smaller = 1;
             } else if (str1_len == str2_len) { 
                 if(strcmp(num1, num2) < 0)      //WE CHECK AGAIN WHICH NUMBER IS BIGGER CAUSE OF CASE EX. 1-9
@@ -368,47 +421,57 @@ void main() {
     
             if (flag1 == 1 && flag2 == 1) {
                 if (str1smaller) {
-                    strcat(result, "+");
+                    sign = '+';
                     sub(&NUM2, &NUM1, &RESULTS);
                 } else {
-                    strcat(result, "-");
+                    sign = '-';
                     sub(&NUM1, &NUM2, &RESULTS);
                 }
                 
             } else if (flag2 == 1) {
-                strcat(result, "+");
+                sign = '+';
                 add(&NUM1, &NUM2, &RESULTS);
 
             } else if (flag1 == 1) {
-                strcat(result, "-");
+                sign = '-';
                 add(&NUM1, &NUM2, &RESULTS);
   
             } else {
                 if (str1smaller) {
-                    strcat(result, "-");
+                    sign = '-';
                     sub(&NUM2, &NUM1, &RESULTS);
                 } else {
-                    strcat(result, "+");
+                    sign = '+';
                     sub(&NUM1, &NUM2, &RESULTS);
                 }
                 
             }
-            DLLtoString(&RESULTS, result);
-            printf("\n(%s) - (%s) = %s\n", str1, str2, result);
+            //DLLtoString(&RESULTS, result);
+            printf("\n(%s) - (%s) = %c", str1, str2, sign);
+            show_StE(&RESULTS);
 
         } else if (option == 3) {
+
+            int str1_len = listLength(&NUM1);
+            int str2_len = listLength(&NUM2);
+
             if (flag1 != flag2) {
-                strcat(result, "-");
+                sign = '-';
             } else {
-                strcat(result, "+");
+               sign = '+';
             }
-            mult(&NUM1, &NUM2, &RESULTS);
-            DLLtoString(&RESULTS, result);
-            printf("(%s) * (%s) = %s", str1, str2, result);
+
+            if (str1_len < str2_len)
+                mult(&NUM2, &NUM1, &RESULTS);
+            else 
+                mult(&NUM1, &NUM2, &RESULTS);
+            //DLLtoString(&RESULTS, result);
+            printf("\n(%s) x (%s) = %c", str1, str2, sign);
+            show_StE(&RESULTS);
 
         }
         fflush(stdin);  // CLEAN THE BUFFER FOR ANY REMANING \N ECT.
-        memset(result, 0, sizeof(result));
+        //memset(sign, 0, sizeof(sign));
     }
 
 }
