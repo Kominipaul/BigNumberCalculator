@@ -23,49 +23,52 @@ typedef struct Node {
 } Node;
 
 
-int digits_only(const char *s) {    //this function flags if the string has anything but digits
+int digits_only(const char *s) {    
+    //This function flags if the string has anything but digits.
     while (*s) {
-        if (isdigit(*s++) == 0) return 0;
+        if (isdigit(*s++) == 0) 
+            return 0;
     }
     return 1;
 }
 
 int get_next(Node** head_ref) {
     Node* tmp = *head_ref;      //CREATE TMP
-    if (tmp->next != NULL) {    //IF LAST NODE
+    if (tmp->next != NULL) {    //IF NOT LAST NODE
         int number = tmp->num;  //GET NUMBER
-        tmp = tmp->next;        //SET HEAD = TO TMP
+        tmp = tmp->next;        //SET HEAD TO TMP(NEXT NODE)
         *head_ref = tmp;
-        return number;          //GET THE NUMBER
+        return number;          
     } else {
-        int number = tmp->num;
-        while (tmp->prev != NULL)   //THE SAME BUT WITH A LOOP
+        int number = tmp->num;      //GET NUMBER
+        while (tmp->prev != NULL)   //GO TO THE FIRST NODE
         {
-            tmp = tmp->prev;
+            tmp = tmp->prev;        //MOVE TMP ONE STEP FORWORD 
         }
-        *head_ref = tmp;
-        return number;
+        *head_ref = tmp;            //SET HEAD TO FIRST NODE
+        return number;          
     }
 }
 
 void insert(Node** head_ref, int num) {
+    //CREATE NEW_NODE && A TMP 
     Node* new_node = (Node*) malloc(sizeof(Node));
-    Node* tmp = *head_ref;  
+    Node* tmp = *head_ref;
 
-    new_node->num = num;
+    new_node->num = num;    //SET THE VALEUs && pass DATA
     new_node->next = NULL;
     new_node->prev = NULL;
 
-    if (*head_ref == NULL)
+    if (*head_ref == NULL)  //IF LIST EMPTY
     {
-       *head_ref = new_node;
+       *head_ref = new_node;    //SET HEAD RO NEW_NODE
        return;
     }
  
-    while (tmp->next != NULL)
-        tmp = tmp->next;
-    tmp->next = new_node;
-    new_node->prev = tmp;
+    while (tmp->next != NULL)   //GO TO THE END OF THE LIST
+        tmp = tmp->next;        //MOVE TMP TO NEXT
+    tmp->next = new_node;       //SET NODE TO LAST NEXT
+    new_node->prev = tmp;       //SET PREV POINTER TO TMP
     return;
 }
 
@@ -199,14 +202,13 @@ void DLLtoString(Node** RESULT, char* result) { //DOUBLE LINK LIST TO STRING
 }
 
 void cpDLL(Node** OR, Node** CP) {
-    Node *ORIGINAL = *OR;
-    deallocate(CP);
-    while(ORIGINAL!= NULL) {
-        push(CP, ORIGINAL->num);
+    Node *ORIGINAL = *OR;           //create tmp to ORIGINAL (OR)
+    deallocate(CP);                 //free CP for any unwanted date
+    while(ORIGINAL!= NULL) {        //Go to the end of the list
+        push(CP, ORIGINAL->num);    //push all the digits to the new node
         
-        ORIGINAL = ORIGINAL->next;
+        ORIGINAL = ORIGINAL->next;  //move the temp OR pointer
     }
-    
 }
 
 void add(Node** NUM1, Node** NUM2, Node** RESULT) {
@@ -251,43 +253,40 @@ void mult(Node** NUM1, Node** NUM2, Node** RESULT) {
 
     int lenS1 = listLength(NUM1);
     int lenS2 = listLength(NUM2);
-    Node* this = NULL;
-    Node* that = NULL;
-    filltheDLL(&this, "0");
-    int k = 0, rem;
-    int ans[lenS1+lenS2];
+    Node* SUM_RESULT = NULL;
+    Node* STORE_RESULT = NULL;
+    filltheDLL(&SUM_RESULT, "0");     //fillthe list with one 0 so we can fo the addison
+    int k = 0, rem;             //set remender and k (k is used for the 0s on the mult)
 
-    for(int i=0; i<lenS2; i++) {
+    for(int i=0; i<lenS2; i++) {        //first loop is for the smallest number 
 
-        int num2 = get_next(NUM2);
-        rem = 0;
+        int num2 = get_next(NUM2);      //get digit from the small number (second)
+        rem = 0;                        // set remender to 0
 
-        for(int j=0; j<lenS1; j++) {
+        for(int j=0; j<lenS1; j++) {        
 
-            int num1 = get_next(NUM1);
-            int sum = num1 * num2 + rem;
-            insert(RESULT, sum % 10);
-            rem = sum / 10;
+            int num1 = get_next(NUM1);      //get digit from the big number (first)
+            int sum = num1 * num2 + rem;    //do the sum digit1 * digit2 + remander
+            insert(RESULT, sum % 10);       //insert the mod of the sum 
+            rem = sum / 10;                 //store the rest in the rem
         }
-        if (rem > 0){
-            insert(RESULT, rem);
+        if (rem > 0){   
+            insert(RESULT, rem);            //add if we have any remander 
         }
 
-        for (int j = 0; j < k; j++) {
+        for (int j = 0; j < k; j++) {       //add 0 for every loop ex(0 - 1 - 2 ...)
             push(RESULT, 0);
         }
-        printf("\n++++++++\n");
-        show_StE(RESULT);
-        printf("\n++++++++\n");
 
-        add(RESULT, &this, &that);
-        cpDLL(&that, &this);
-        deallocate(&that);
-        deallocate(RESULT);
-        k++; 
+        //Store is used only so we can call the add func
+        add(RESULT, &SUM_RESULT, &STORE_RESULT);       //call add func pass result. 
+        cpDLL(&STORE_RESULT, &SUM_RESULT);            // cp Store to Sum. 
+        deallocate(&STORE_RESULT);                   // free
+        deallocate(RESULT);                         // free
+        k++;
 
     }
-    cpDLL(&this, RESULT);
+    cpDLL(&SUM_RESULT, RESULT);                //copy the Sum to the RESULT
     
 }
 
@@ -321,8 +320,9 @@ void main() {
         //CREATE THE STRING FOR THE NUMBERS
         char str1[MAX_SIZE], str2[MAX_SIZE], num1[MAX_SIZE], num2[MAX_SIZE];
         char sign;
-        int flag1 = 0, flag2 = 0;
-        Node* NUM1 = NULL;
+        int flag1 = 0, flag2 = 0;   //flag for negative number if 1 number is negative else 0.
+        //CREATE THE HEAD for the Lists
+        Node* NUM1 = NULL;          
         Node* NUM2 = NULL;
         Node* RESULTS = NULL;
 
@@ -333,19 +333,20 @@ void main() {
             scanf("%s",&str1);
             printf("Enter the second number: ");
             scanf("%s",&str2);
+            //make a cp of the numbers 
             strcpy(num1,str1);
             strcpy(num2,str2);
 
             if (num1[0] == '-') {
-                memmove(num1, num1+1, strlen(num1));
+                memmove(num1, num1+1, strlen(num1));    //check for - if so set flag to 1 and remove it (-).
                 flag1 = 1;
             } else if (num1[0] == '+')
             {
-                memmove(num1, num1+1, strlen(num1));
+                memmove(num1, num1+1, strlen(num1));    //check for + if so set flag to 1 and remove it (+).
             }
             
             if (num2[0] == '-') {
-                memmove(num2, num2+1, strlen(num2));
+                memmove(num2, num2+1, strlen(num2));    //same for number2
                 flag2 = 1;
             } else if (num2[0] == '+')
             {
@@ -358,7 +359,7 @@ void main() {
             }
         } while (!digits_only(num1) || !digits_only(num2));
 
-        filltheDLL(&NUM1, num1);
+        filltheDLL(&NUM1, num1);    //call the filltheDLL pass head and list of number(in string form).
         filltheDLL(&NUM2, num2);
         
         //CHECK WHAT OPTION USER WANTS. CALL THE APPROPRIATE FUNC AND PRINT RESULTS.
@@ -366,7 +367,7 @@ void main() {
             int str1_len = listLength(&NUM1);
             int str2_len = listLength(&NUM2);
 
-            int str1smaller = 0;
+            int str1smaller = 0;    //flag if first number is smaller 
             
             if (str1_len < str2_len) {
                 str1smaller = 1;
@@ -375,21 +376,21 @@ void main() {
                 str1smaller = 1;
             }
     
-            if (flag1 == 1 && flag2 == 1) {
+            if (flag1 == 1 && flag2 == 1) {     //if both negative final sign is - 
                 sign = '-';
-                add(&NUM1, &NUM2, &RESULTS);
+                add(&NUM1, &NUM2, &RESULTS);    //so call add
 
-            } else if (flag2 == 1) {
-                if (str1smaller) {
+            } else if (flag2 == 1) {            //if num2 is negative
+                if (str1smaller) {              // and num1 smaller then sign is -
                     sign = '-';
-                    sub(&NUM2, &NUM1, &RESULTS);
+                    sub(&NUM2, &NUM1, &RESULTS);    //call sub with num2 first cause first input is always the big number
                 } else {
                     sign = '+';
-                    sub(&NUM1, &NUM2, &RESULTS);
+                    sub(&NUM1, &NUM2, &RESULTS);    //call sub with num1 and num2 after cause first...
                 }
 
-            } else if (flag1 == 1) {
-                if (str1smaller) {
+            } else if (flag1 == 1) {                //if num1 is negative ... same logic we check contisions 
+                if (str1smaller) {                  //so we can call the right function same with sub and mult.
                     sign = '+';
                     sub(&NUM2, &NUM1, &RESULTS);
                 } else {
@@ -403,8 +404,8 @@ void main() {
 
             }
             //DLLtoString(&RESULTS, result);
-            printf("\n(%s) + (%s) = %c", str1, str2, sign);
-            show_StE(&RESULTS);
+            printf("\n(%s) + (%s) = %c", str1, str2, sign);     //print the inputs and the signs
+            show_StE(&RESULTS);                                 //print result from head to tail digit by digit
 
         } else if (option == 2) {
             int str1_len = listLength(&NUM1);
@@ -419,7 +420,7 @@ void main() {
                 str1smaller = 1;
             }
     
-            if (flag1 == 1 && flag2 == 1) {
+            if (flag1 == 1 && flag2 == 1) {         //same logic with add
                 if (str1smaller) {
                     sign = '+';
                     sub(&NUM2, &NUM1, &RESULTS);
@@ -447,31 +448,31 @@ void main() {
                 
             }
             //DLLtoString(&RESULTS, result);
-            printf("\n(%s) - (%s) = %c", str1, str2, sign);
-            show_StE(&RESULTS);
+            printf("\n(%s) - (%s) = %c", str1, str2, sign);     //print the inputs and the signs
+            show_StE(&RESULTS);                                 //print result from head to tail digit by digit
 
         } else if (option == 3) {
 
             int str1_len = listLength(&NUM1);
             int str2_len = listLength(&NUM2);
 
-            if (flag1 != flag2) {
+            if (flag1 != flag2) {   //if both negative of pos the pos sign (+)
                 sign = '-';
-            } else {
+            } else {                //else neg sign (-)
                sign = '+';
             }
 
-            if (str1_len < str2_len)
-                mult(&NUM2, &NUM1, &RESULTS);
+            if (str1_len < str2_len)            //check which is longer/bigger so it is first
+                mult(&NUM2, &NUM1, &RESULTS);   
             else 
                 mult(&NUM1, &NUM2, &RESULTS);
             //DLLtoString(&RESULTS, result);
-            printf("\n(%s) x (%s) = %c", str1, str2, sign);
-            show_StE(&RESULTS);
+            printf("\n(%s) x (%s) = %c", str1, str2, sign);     //print the inputs and the signs
+            show_StE(&RESULTS);                                 //print result from head to tail digit by digit
 
         }
         fflush(stdin);  // CLEAN THE BUFFER FOR ANY REMANING \N ECT.
-        //memset(sign, 0, sizeof(sign));
     }
 
 }
+// hope the code/comments are clear any questions at :      dit21090@go.uop.gr   
