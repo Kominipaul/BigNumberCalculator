@@ -60,9 +60,8 @@ Suppose you want to add two numbers:
 
 The program will display: `123 + 456 = 579`.
 
-## Notes
+ect
 
-- The code snippet provided is incomplete. You need to implement the missing parts related to number conversion and linked list handling.
-- Feel free to extend the program to include more operations or improve its functionality.
+
 
 
