@@ -14,7 +14,7 @@ cd BigNumberCalculator
 ### Compile the Code:
 
 ```bash
-gcc main.c -o BigNumberCalculator
+gcc Omada34.c -o BigNumberCalculator
 ```
 
 ### Run the Program:
