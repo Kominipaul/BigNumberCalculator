@@ -7,20 +7,20 @@ This repository contains a simple C program that allows users to perform basic a
 ### Clone the Repository:
 
 ```bash
-git clone https://github.com/your-username/arithmetic-operations.git
-cd arithmetic-operations
+git clone https://github.com/Kominipaul/BigNumberCalculator
+cd BigNumberCalculator
 ```
 
 ### Compile the Code:
 
 ```bash
-gcc main.c -o arithmetic
+gcc main.c -o BigNumberCalculator
 ```
 
 ### Run the Program:
 
 ```bash
-./arithmetic
+./BigNumberCalculator
 ```
 
 ## Usage
