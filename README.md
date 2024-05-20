@@ -1,6 +1,6 @@
 # Arithmetic Operations Program
 
-This repository contains a simple C program that allows users to perform basic arithmetic operations (addition, subtraction, and multiplication) on two numbers. The program provides a menu-driven interface for user interaction.
+This repository contains a simple C program that allows users to perform basic arithmetic operations (addition, subtraction, and multiplication) on large two numbers. Implementing operations on very large numbers using a linked list can be an efficient way to handle arithmetic that exceeds the standard data type limits. The program provides a menu-driven interface for user interaction.
 
 ## Getting Started
 
